@@ -46,3 +46,35 @@ export const registerUser = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = /api/auth/login
+// Function to login a new user
+// Auth = false
+
+export const loginUser = async (req, res, next) => {
+  const { errors, isValid } = inputValidator(req.body);
+
+  if (!isValid) {
+    return res.status(400).json({
+      status: "fail",
+      errorType: "invalid-input",
+      errors,
+    });
+  }
+
+  try {
+    const foundUser = await User.findOne({
+      $or: [{ username: req.body.usernameOrEmail }, { email: req.body.usernameOrEmail }],
+    }).select("+password");
+
+    // Check if the username or email and password match
+    if (!foundUser || !(await foundUser.comparePassword(req.body.password, foundUser.password))) {
+      return next(new ApiError("The given credentials are invalid", "login-error", 401));
+    }
+
+    foundUser.password = undefined;
+    sendAuthToken(foundUser, res);
+  } catch (err) {
+    next(err);
+  }
+};
