@@ -1,7 +1,7 @@
 import validator from "validator";
 
-import isEmpty from "../utils/isEmpty";
-import registerValidator from "./registerValidator";
+import isEmpty from "../utils/isEmpty.js";
+import registerValidator from "./registerValidator.js";
 
 const inputValidator = (data, type) => {
   // If the user doesn't send any data

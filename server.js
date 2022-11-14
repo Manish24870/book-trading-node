@@ -4,12 +4,14 @@ import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
 
-import globalErrorHandler from "./controllers/errorController";
+import authRouter from "./routes/authRoutes.js";
+import globalErrorHandler from "./controllers/errorController.js";
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 // Connect to databse
 mongoose
@@ -23,6 +25,9 @@ mongoose
     console.log("Error connecting to databse");
     console.log(err);
   });
+
+// Mount routes
+app.use("/api/auth", authRouter);
 
 // Global error handler
 app.use(globalErrorHandler);

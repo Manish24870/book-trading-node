@@ -9,7 +9,7 @@ const registerValidator = (data) => {
   if (data.username && !validator.isLength(validator.trim(data.username), { min: 4 })) {
     errors.username = "Username must be at least 4 characters";
   }
-  if (data.password && !validator.isLength(validator.trim(data.password), { min: 5 })) {
+  if (data.password && !validator.isLength(validator.trim(data.password), { min: 4 })) {
     errors.password = "Password must be at least 4 characters";
   }
 
