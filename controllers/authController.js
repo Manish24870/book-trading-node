@@ -22,6 +22,7 @@ const sendAuthToken = (user, res) => {
 // Function to register a new user
 // Auth = false
 export const registerUser = async (req, res, next) => {
+  console.log(req.body);
   const { errors, isValid } = inputValidator(req.body, "register-user");
 
   if (!isValid) {
@@ -34,6 +35,7 @@ export const registerUser = async (req, res, next) => {
 
   const newUser = new User({
     username: req.body.username,
+    name: req.body.name,
     email: req.body.email,
     password: req.body.password,
   });

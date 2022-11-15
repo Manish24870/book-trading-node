@@ -28,7 +28,7 @@ const inputValidator = (data, type) => {
 
   // Check for empty string
   for (const key in data) {
-    if (validator.isEmpty(String(data[key])) && key !== "additionals") {
+    if (validator.isEmpty(String(data[key]))) {
       let keyText = key.replace(/([a-z])([A-Z])/g, "$1 $2");
       keyText = keyText.charAt(0).toUpperCase() + keyText.slice(1);
       errors[key] = `${keyText} is required`;
