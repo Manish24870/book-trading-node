@@ -74,6 +74,7 @@ export const loginUser = async (req, res, next) => {
     foundUser.password = undefined;
     sendAuthToken(foundUser, res);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

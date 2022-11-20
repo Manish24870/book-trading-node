@@ -5,6 +5,7 @@ import chalk from "chalk";
 import dotenv from "dotenv";
 
 import authRouter from "./routes/authRoutes.js";
+import bookRouter from "./routes/bookRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 
 dotenv.config();
@@ -12,6 +13,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+// app.use(express.urlencoded({ extended: false }));
 
 // Connect to databse
 mongoose
@@ -28,6 +30,7 @@ mongoose
 
 // Mount routes
 app.use("/api/auth", authRouter);
+app.use("/api/books", bookRouter);
 
 // Global error handler
 app.use(globalErrorHandler);

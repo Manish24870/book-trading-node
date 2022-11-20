@@ -25,6 +25,9 @@ const inputValidator = (data, type) => {
   if (type === "register-user") {
     errors = registerValidator(data);
   }
+  if (type === "add-book") {
+    delete data["publisher"];
+  }
 
   // Check for empty string
   for (const key in data) {
