@@ -48,3 +48,99 @@ export const addBook = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = /api/books
+// Function to fetch all books
+// Auth = true
+export const getAllBooks = async (req, res, next) => {
+  const { page = 1, limit = 10 } = req.query;
+  try {
+    const books = await Book.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort("-createdAt");
+    const count = await Book.countDocuments();
+
+    res.status(200).json({
+      status: "Success",
+      message: "Books fetched successfully",
+      books,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = /api/books/byListing
+// Function to fetch selling books
+// Auth = true
+export const getBooksByListing = async (req, res, next) => {
+  const { page = 1, limit = 10, type } = req.query;
+  try {
+    const books = await Book.find({ listing: type })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort("-createdAt");
+    const count = await Book.countDocuments({ listing: type });
+
+    res.status(200).json({
+      status: "Success",
+      message: "Books fetched successfully",
+      books,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = /api/books/exchange
+// Function to fetch exchanging books
+// Auth = true
+// export const getExchangeBooks = async (req, res, next) => {
+//   const { page = 1, limit = 10 } = req.query;
+//   try {
+//     const books = await Book.find({ listing: "Exchange" })
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .sort("-createdAt");
+//     const count = await Book.countDocuments();
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: "Books fetched successfully",
+//       books,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+// Route = /api/books/auction
+// Function to fetch auctioning books
+// Auth = true
+// export const getAuctionBooks = async (req, res, next) => {
+//   const { page = 1, limit = 10 } = req.query;
+//   try {
+//     const books = await Book.find({ listing: "Auction" })
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .sort("-createdAt");
+//     const count = await Book.countDocuments();
+
+//     res.status(200).json({
+//       status: "Success",
+//       message: "Books fetched successfully",
+//       books,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
