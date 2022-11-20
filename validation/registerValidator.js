@@ -13,10 +13,6 @@ const registerValidator = (data) => {
     errors.password = "Password must be at least 4 characters";
   }
 
-  if (data.password && data.passwordConfirm && data.password !== data.passwordConfirm) {
-    errors.password = "Passwords must be same";
-  }
-
   return errors;
 };
 

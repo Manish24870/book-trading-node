@@ -19,7 +19,7 @@ const globalErrorHandler = (err, req, res, next) => {
   res.status(err.statusCode).json({
     status: err.status,
     errorType: err.errorType,
-    message: err.message,
+    error: err.message,
   });
 };
 
@@ -28,15 +28,12 @@ const sendError = (err, customErr, res) => {
   res.status(err.statusCode).json({
     status: err.status,
     errorType: err.errorType,
-    data: {
-      errors: customErr,
-    },
+    error: customErr,
   });
 };
 
 // Function to handle duplicate data errors
 const handleDuplicateDataErrors = (err) => {
-  console.log("ERR", typeof err.keyValue);
   const errors = {};
   for (let key in err.keyValue) {
     errors[key] = `This ${key} is taken`;

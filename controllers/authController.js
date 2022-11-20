@@ -10,11 +10,9 @@ const sendAuthToken = (user, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   res.status(200).json({
     status: "success",
-    data: {
-      message: "Logged in successfully",
-      user,
-      token,
-    },
+    message: "Logged in successfully",
+    user,
+    token,
   });
 };
 
@@ -22,14 +20,13 @@ const sendAuthToken = (user, res) => {
 // Function to register a new user
 // Auth = false
 export const registerUser = async (req, res, next) => {
-  console.log(req.body);
   const { errors, isValid } = inputValidator(req.body, "register-user");
 
   if (!isValid) {
     return res.status(400).json({
       status: "fail",
       errorType: "invalid-input",
-      errors,
+      error: errors,
     });
   }
 
@@ -60,13 +57,13 @@ export const loginUser = async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       errorType: "invalid-input",
-      errors,
+      error: errors,
     });
   }
 
   try {
     const foundUser = await User.findOne({
-      $or: [{ username: req.body.usernameOrEmail }, { email: req.body.usernameOrEmail }],
+      $or: [{ username: req.body.username }, { email: req.body.username }],
     }).select("+password");
 
     // Check if the username or email and password match
