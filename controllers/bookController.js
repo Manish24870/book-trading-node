@@ -53,13 +53,24 @@ export const addBook = async (req, res, next) => {
 // Function to fetch all books
 // Auth = true
 export const getAllBooks = async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, type = "All" } = req.query;
+  let books, count;
   try {
-    const books = await Book.find()
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort("-createdAt");
-    const count = await Book.countDocuments();
+    if (type === "All") {
+      books = await Book.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .sort("-createdAt")
+        .populate("owner");
+      count = await Book.countDocuments();
+    } else {
+      books = await Book.find({ listing: type })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .sort("-createdAt")
+        .populate("owner");
+      count = await Book.countDocuments({ listing: type });
+    }
 
     res.status(200).json({
       status: "Success",

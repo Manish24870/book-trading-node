@@ -7,7 +7,7 @@ import { protect } from "../middleware/auth.js";
 const router = express.Router();
 
 router.post("/add", protect, upload.array("images"), addBook);
-router.get("/all", protect, getAllBooks);
+router.get("/", protect, getAllBooks);
 router.get("/byListing", protect, getBooksByListing);
 
 export default router;
