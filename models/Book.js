@@ -60,6 +60,22 @@ const bookSchema = new mongoose.Schema(
         },
       },
     ],
+    discussion: [
+      {
+        question: {
+          type: String,
+          trim: true,
+        },
+        answer: {
+          type: String,
+          trim: true,
+        },
+        askedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

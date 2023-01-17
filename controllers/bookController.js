@@ -2,7 +2,7 @@ import Book from "../models/Book.js";
 import inputValidator from "../validation/inputValidator.js";
 import ApiError from "../utils/apiError.js";
 
-// Route = /api/books/add
+// Route = POST /api/books/add
 // Function to add a new book listing
 // Auth = true
 export const addBook = async (req, res, next) => {
@@ -49,7 +49,7 @@ export const addBook = async (req, res, next) => {
   }
 };
 
-// Route = /api/books
+// Route = GET /api/books
 // Function to fetch all books
 // Auth = true
 export const getAllBooks = async (req, res, next) => {
@@ -84,17 +84,33 @@ export const getAllBooks = async (req, res, next) => {
   }
 };
 
-// Route = /api/books
+// Route = GET /api/books
 // Function to fetch all books
 // Auth = true
 export const getBook = async (req, res, next) => {
   try {
-    const book = await Book.findById(req.params.bookId);
+    const book = await Book.findById(req.params.bookId).populate("owner");
     res.status(200).json({
       status: "Success",
       message: "Book fetched successfully",
       book,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = DELETE /api/books/:bookId
+// Function to delete a book
+// Auth = true
+export const deleteBook = async (req, res, next) => {
+  try {
+    await Book.findByIdAndDelete(req.params.bookId);
+    res.status(200).json({
+      status: "Success",
+      message: "Book deleted successfully",
+    });
+    // TODO delete book from favorites and others also
   } catch (err) {
     next(err);
   }
