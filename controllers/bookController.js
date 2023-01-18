@@ -115,3 +115,65 @@ export const deleteBook = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = POST /api/books/:bookId/question
+// Function to create a new question
+// Auth = true
+export const createQuestion = async (req, res, next) => {
+  const { errors, isValid } = inputValidator(req.body);
+  if (!isValid) {
+    return res.status(400).json({
+      status: "fail",
+      errorType: "invalid-input",
+      error: errors,
+    });
+  }
+  try {
+    const book = await Book.findById(req.params.bookId).populate("owner");
+
+    const newQuestion = {
+      question: req.body.question,
+      askedBy: req.user._id,
+    };
+    book.discussion.push(newQuestion);
+    await book.save();
+    res.status(200).json({
+      status: "Success",
+      message: "Question created successfully",
+      book,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = POST /api/books/:bookId/answer
+// Function to create a new answer
+// Auth = true
+export const createAnswer = async (req, res, next) => {
+  const { errors, isValid } = inputValidator(req.body);
+  if (!isValid) {
+    return res.status(400).json({
+      status: "fail",
+      errorType: "invalid-input",
+      data: {
+        errors,
+      },
+    });
+  }
+
+  try {
+    const book = await Book.findById(req.params.bookId).populate("owner");
+    const questionIndex = book.discussion.findIndex((el) => el._id.equals(req.body.questionId));
+    book.discussion[questionIndex].answer = req.body.answer;
+    await book.save();
+
+    res.status(200).json({
+      status: "Success",
+      message: "Question created successfully",
+      book,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
