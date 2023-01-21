@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 
 import authRouter from "./routes/authRoutes.js";
 import bookRouter from "./routes/bookRoutes.js";
+import stripeRouter from "./routes/stripeRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 
 dotenv.config();
@@ -31,6 +32,7 @@ mongoose
 // Mount routes
 app.use("/api/auth", authRouter);
 app.use("/api/books", bookRouter);
+app.use("/api/stripe", stripeRouter);
 
 // Global error handler
 app.use(globalErrorHandler);

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import Stripe from "stripe";
 
 import User from "../models/User.js";
 import inputValidator from "../validation/inputValidator.js";
@@ -30,11 +31,21 @@ export const registerUser = async (req, res, next) => {
     });
   }
 
+  const stripeAccount = await Stripe(process.env.STRIPE_KEY).accounts.create({
+    country: "US",
+    type: "express",
+    capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+    business_type: "individual",
+    business_profile: { url: "https://github.com" },
+    email: req.body.email,
+  });
+
   const newUser = new User({
     username: req.body.username,
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
+    stripeId: stripeAccount.id,
   });
 
   try {

@@ -1,6 +1,27 @@
 import Book from "../models/Book.js";
 import inputValidator from "../validation/inputValidator.js";
 import ApiError from "../utils/apiError.js";
+import Stripe from "stripe";
+
+export const stripeTest = async (req, res, next) => {
+  const acct = await Stripe(
+    "sk_test_51MSJebAffzcoqh8LpOwpTuKoRT0tr4SIYayS5KPuCDWwm8YT2nJ2NRzpzls6X2AlOGaTRnWxbCFSvlxnizNBvVQh00FEoJpusN"
+  ).accounts.create({
+    type: "standard",
+    email: "usertwo@gmail.com",
+  });
+
+  const acctLink = await Stripe(
+    "sk_test_51MSJebAffzcoqh8LpOwpTuKoRT0tr4SIYayS5KPuCDWwm8YT2nJ2NRzpzls6X2AlOGaTRnWxbCFSvlxnizNBvVQh00FEoJpusN"
+  ).accountLinks.create({
+    account: "acct_1MSaNiPB8mMlCkl5",
+    refresh_url: "http://localhost:5000/api/books/stripe-ref",
+    return_url: "http://localhost:5000/api/books/stripe-ret",
+    type: "account_onboarding",
+  });
+
+  console.log(acctLink);
+};
 
 // Route = POST /api/books/add
 // Function to add a new book listing

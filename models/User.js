@@ -33,6 +33,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "user",
     },
+    stripeId: {
+      type: String,
+    },
+    stripeOnboarded: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
