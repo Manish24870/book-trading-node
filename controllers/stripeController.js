@@ -70,3 +70,49 @@ export const stripeAuthorize = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = POST /api/stripe/payment
+// Pay in stripe
+// Auth = true
+export const stripePayment = async (req, res, next) => {
+  try {
+    const session = await Stripe(process.env.STRIPE_KEY).checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "product_1",
+            },
+            unit_amount: 10000,
+          },
+          quantity: 1,
+        },
+      ],
+      // line_items: [
+      //   {
+      //     price: "20.0",
+      //     quantity: 1,
+      //   },
+      // ],
+      mode: "payment",
+      success_url: "http://localhost:3000/my-profile",
+      cancel_url: "http://localhost:3000/my-profile",
+      payment_intent_data: {
+        application_fee_amount: 10,
+        transfer_data: {
+          destination: "acct_1MSZnJPGt7Ac44Fm",
+        },
+      },
+    });
+    console.log(session);
+    res.status(200).json({
+      status: "success",
+      message: "Stripe payment success",
+      session,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
