@@ -35,6 +35,17 @@ const walletSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        buyer: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        seller: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+        ],
+        items: [],
       },
     ],
   },

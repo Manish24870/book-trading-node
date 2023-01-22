@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Stripe from "stripe";
+import Wallet from "../models/Wallet.js";
 
 // Route = POST /api/stripe/create-link
 // Generate a stripe account link for user
@@ -10,7 +11,7 @@ export const generateStripeAccountLink = async (req, res, next) => {
       account: req.user.stripeId,
       type: "account_onboarding",
       refresh_url: "http://localhost:5000/api/stripe/authorize",
-      return_url: "http://localhost:5000/api/stripe/onboard",
+      return_url: "http://localhost:3000/onboard",
     });
     return res.status(200).json({
       status: "success",
@@ -29,9 +30,11 @@ export const generateStripeAccountLink = async (req, res, next) => {
 export const stripeAccountOnboard = async (req, res, next) => {
   try {
     const account = await Stripe(process.env.STRIPE_KEY).account.retrieve(req.user.stripeId);
+    const wallet = await Wallet.findOne({ owner: req.user._id });
+
     if (account.details_submitted) {
-      req.user.stripeOnboarder = true;
-      await req.user.save();
+      wallet.stripeOnboarded = true;
+      await wallet.save();
       return res.status(200).json({
         status: "success",
         message: "Stripe onboard success",
@@ -58,7 +61,7 @@ export const stripeAuthorize = async (req, res, next) => {
       account: req.user.stripeId,
       type: "account_onboarding",
       refresh_url: "http://localhost:5000/api/books/stripe/authorize",
-      return_url: "http://localhost:5000/api/books/stripe/onboard",
+      return_url: "http://localhost:3000/onboard",
     });
     return res.status(200).json({
       status: "success",
