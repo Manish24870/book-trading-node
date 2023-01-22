@@ -15,6 +15,10 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    stripeOnboarded: {
+      type: Boolean,
+      default: false,
+    },
     stripeTransactions: [],
     appTransactions: [
       {

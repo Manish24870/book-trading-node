@@ -3,17 +3,20 @@ import Wallet from "../models/Wallet.js";
 
 // LOAD THE WALLET
 export const loadWallet = async (req, res, next) => {
-  const loadAmount = req.body.loadAmount / 130;
+  console.log("LOAD WALLET");
+  const loadAmount = req.body.amount / 130;
   try {
+    const wallet = await Wallet.findById(req.user.wallet);
+
     const session = await Stripe(process.env.STRIPE_KEY).checkout.sessions.create({
-      lineItems: [
+      line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
               name: "load_wallet",
             },
-            unit_amount: loadAmount * 100,
+            unit_amount: Math.floor(loadAmount * 100),
           },
           quantity: 1,
         },
@@ -28,10 +31,17 @@ export const loadWallet = async (req, res, next) => {
         },
       },
     });
+    wallet.stripeTransactions.push(session);
+    wallet.amount += loadAmount * 130;
+    await wallet.save();
+
+    console.log("WALLET LOADED");
+
     res.status(200).json({
       status: "success",
       message: "Wallet loaded successfully",
-      session,
+      sessionUrl: session.url,
+      wallet,
     });
   } catch (err) {
     next(err);

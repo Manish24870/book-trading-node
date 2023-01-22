@@ -36,10 +36,6 @@ const userSchema = new mongoose.Schema(
     stripeId: {
       type: String,
     },
-    stripeOnboarded: {
-      type: Boolean,
-      default: false,
-    },
     wallet: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",

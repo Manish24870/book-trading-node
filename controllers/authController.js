@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import Stripe from "stripe";
 
+import Wallet from "../models/Wallet.js";
 import User from "../models/User.js";
 import inputValidator from "../validation/inputValidator.js";
 import ApiError from "../utils/apiError.js";
@@ -54,8 +55,15 @@ export const registerUser = async (req, res, next) => {
     stripeId: stripeAccount.id,
   });
 
+  const newWallet = new Wallet({
+    owner: newUser._id,
+    stripeId: stripeAccount.id,
+  });
+
   try {
+    newUser.wallet = newWallet._id;
     await newUser.save();
+    await newWallet.save();
     newUser.password = undefined;
     sendAuthToken(newUser, res);
   } catch (err) {
@@ -89,6 +97,7 @@ export const loginUser = async (req, res, next) => {
     }
 
     foundUser.password = undefined;
+
     sendAuthToken(foundUser, res);
   } catch (err) {
     console.log(err);
