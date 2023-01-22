@@ -31,6 +31,8 @@ export const registerUser = async (req, res, next) => {
     });
   }
 
+  const [first_name, last_name] = req.body.name.split(" ");
+
   const stripeAccount = await Stripe(process.env.STRIPE_KEY).accounts.create({
     country: "US",
     type: "express",
@@ -38,6 +40,10 @@ export const registerUser = async (req, res, next) => {
     business_type: "individual",
     business_profile: { url: "https://github.com" },
     email: req.body.email,
+    individual: {
+      first_name,
+      last_name,
+    },
   });
 
   const newUser = new User({

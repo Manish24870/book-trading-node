@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const walletSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     stripeId: {
       type: String,
       required: true,
@@ -11,7 +15,8 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
-    transactions: [
+    stripeTransactions: [],
+    appTransactions: [
       {
         transactionType: {
           type: String,

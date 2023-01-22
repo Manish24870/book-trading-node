@@ -5,13 +5,12 @@ import Stripe from "stripe";
 // Generate a stripe account link for user
 // Auth = true
 export const generateStripeAccountLink = async (req, res, next) => {
-  console.log("AAA");
   try {
     const accountLink = await Stripe(process.env.STRIPE_KEY).accountLinks.create({
       account: req.user.stripeId,
       type: "account_onboarding",
-      refresh_url: "http://localhost:5000/api/books/stripe/authorize",
-      return_url: "http://localhost:5000/api/books/stripe/onboard",
+      refresh_url: "http://localhost:5000/api/stripe/authorize",
+      return_url: "http://localhost:5000/api/stripe/onboard",
     });
     return res.status(200).json({
       status: "success",
@@ -89,12 +88,7 @@ export const stripePayment = async (req, res, next) => {
           quantity: 1,
         },
       ],
-      // line_items: [
-      //   {
-      //     price: "20.0",
-      //     quantity: 1,
-      //   },
-      // ],
+
       mode: "payment",
       success_url: "http://localhost:3000/my-profile",
       cancel_url: "http://localhost:3000/my-profile",
@@ -113,6 +107,20 @@ export const stripePayment = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
+    next(err);
+  }
+};
+
+export const stripeCharge = async (req, res, next) => {
+  try {
+    const charge = await Stripe(process.env.STRIPE_KEY).charges.create({
+      amount: 2000,
+      currency: "usd",
+      description: "Test charge",
+      source: req.user.stripeId,
+    });
+    console.log(charge);
+  } catch (err) {
     next(err);
   }
 };
