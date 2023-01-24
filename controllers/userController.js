@@ -1,3 +1,5 @@
+import bcrypt from "bcryptjs";
+
 import User from "../models/User.js";
 import ApiError from "../utils/apiError.js";
 import isEmpty from "../utils/isEmpty.js";
@@ -23,7 +25,12 @@ export const getmyProfile = async (req, res, next) => {
 // Function to edit a user profile
 // Auth = true
 export const editProfile = async (req, res, next) => {
-  const { errors, isValid } = inputValidator(req.body);
+  let validationData = { ...req.body };
+  delete validationData["password"];
+  delete validationData["confirmPassword"];
+  const { errors, isValid } = inputValidator(validationData);
+
+  console.log("BODY", req.body);
 
   if (!isValid) {
     return res.status(400).json({
@@ -65,6 +72,21 @@ export const editProfile = async (req, res, next) => {
       errorType: "invalid-input",
       error: duplicateErrors,
     });
+  }
+
+  // If user has input the password
+  if (!isEmpty(req.body.password) || !isEmpty(req.body.confirmPassword)) {
+    if (req.body.password === req.body.confirmPassword) {
+      newUserData.password = await bcrypt.hash(req.body.password, 12);
+    } else {
+      return res.status(400).json({
+        status: "fail",
+        errorType: "invalid-input",
+        error: {
+          password: "The passwords do not match",
+        },
+      });
+    }
   }
 
   // Update the user profile
