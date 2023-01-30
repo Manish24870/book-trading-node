@@ -75,7 +75,7 @@ export const editProfile = async (req, res, next) => {
   }
 
   // If user has input the password
-  if (!isEmpty(req.body.password) || !isEmpty(req.body.confirmPassword)) {
+  if (!isEmpty(req.body.password) || !isEmpty(req.body.confirmPassword``)) {
     if (req.body.password === req.body.confirmPassword) {
       newUserData.password = await bcrypt.hash(req.body.password, 12);
     } else {

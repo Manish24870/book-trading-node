@@ -32,7 +32,7 @@ export const addBook = async (req, res, next) => {
     publisher: req.body.publisher,
     publishedDate: req.body.publishedDate,
     language: req.body.language,
-    price: req.body.price,
+    price: req.body.listing === "Exchange" ? 0 : req.body.price,
     bookQuality: req.body.bookQuality,
     owner: req.user._id,
     images: bookImages,
