@@ -9,6 +9,7 @@ import bookRouter from "./routes/bookRoutes.js";
 import stripeRouter from "./routes/stripeRoutes.js";
 import walletRouter from "./routes/walletRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import exchangeRouter from "./routes/exchangeRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/books", bookRouter);
 app.use("/api/stripe", stripeRouter);
 app.use("/api/wallet", walletRouter);
 app.use("/api/user", userRouter);
+app.use("/api/exchange", exchangeRouter);
 
 // Global error handler
 app.use(globalErrorHandler);
