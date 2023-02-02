@@ -4,7 +4,7 @@ const exchangeSchema = new mongoose.Schema(
   {
     initiator: [
       {
-        initiator: {
+        initiatorUser: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
           required: true,
@@ -33,6 +33,11 @@ const exchangeSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    bookWanted: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Book",
       required: true,
     },
     isExchanged: {
