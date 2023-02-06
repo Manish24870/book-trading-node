@@ -115,7 +115,7 @@ export const getMyOffers = async (req, res, next) => {
   }
 };
 
-// Route = GET /api/exchange/:exchangeId/accept
+// Route = GET /api/exchange/accept-offer
 // Function to accept an exchange offer
 // Auth = true
 export const acceptOffer = async (req, res, next) => {
@@ -144,6 +144,27 @@ export const acceptOffer = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Offer accepted",
+      exchange,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = GET /api/exchange/reject-offer
+// Function to reject an exchange offer
+// Auth = true
+export const rejectOffer = async (req, res, next) => {
+  try {
+    const exchange = await Exchange.findById(req.body.exchangeId);
+    const initiatorIndex = exchange.initiator.findIndex((el) =>
+      el._id.equals(req.body.initiatorItemId)
+    );
+    exchange.initiator[initiatorIndex].offerStatus = "rejected";
+    await exchange.save();
+    res.status(200).json({
+      status: "success",
+      message: "Offer rejected",
       exchange,
     });
   } catch (err) {
