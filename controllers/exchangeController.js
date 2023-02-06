@@ -1,5 +1,6 @@
 import Book from "../models/Book.js";
 import Exchange from "../models/Exchange.js";
+import ApiError from "../utils/apiError.js";
 
 // Route = GET /api/exchange/my-exchange-books
 // Function to get my exchange books
@@ -108,6 +109,42 @@ export const getMyOffers = async (req, res, next) => {
       status: "success",
       message: "My exchange offers fetched successfully",
       myOffers,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = GET /api/exchange/:exchangeId/accept
+// Function to accept an exchange offer
+// Auth = true
+export const acceptOffer = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    const exchange = await Exchange.findById(req.body.exchangeId);
+    const initiatorIndex = exchange.initiator.findIndex((el) =>
+      el._id.equals(req.body.initiatorItemId)
+    );
+    console.log(initiatorIndex);
+    // If the book has already been exchanged
+    if (exchange.isExchanged) {
+      return next(new ApiError("This book has already been exchanged", 400));
+    }
+
+    exchange.isExchanged = true;
+    exchange.initiator[initiatorIndex].offerStatus = "accepted";
+    exchange.initiator[initiatorIndex].acceptedAt = Date.now();
+    exchange.initiator.forEach((el, index) => {
+      if (index !== initiatorIndex) {
+        el.offerStatus = "rejected";
+      }
+    });
+
+    await exchange.save();
+    res.status(200).json({
+      status: "success",
+      message: "Offer accepted",
+      exchange,
     });
   } catch (err) {
     next(err);
