@@ -1,4 +1,5 @@
 import Book from "../models/Book.js";
+import Auction from "../models/Auction.js";
 import inputValidator from "../validation/inputValidator.js";
 import ApiError from "../utils/apiError.js";
 import Stripe from "stripe";
@@ -40,6 +41,16 @@ export const addBook = async (req, res, next) => {
 
   try {
     await newBook.save();
+
+    // Create a new auction if the listing type is auction
+    if (newBook.listing === "Auction") {
+      const newAuction = new Auction({
+        owner: req.user._id,
+        book: newBook._id,
+      });
+      await newAuction.save();
+    }
+
     res.status(201).json({
       status: "success",
       message: "Book added successfully",

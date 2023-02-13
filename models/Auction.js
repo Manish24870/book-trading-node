@@ -7,6 +7,10 @@ const auctionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    book: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Book",
+    },
     isAuctioned: {
       type: Boolean,
       default: false,
@@ -26,6 +30,15 @@ const auctionSchema = new mongoose.Schema(
     winner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+    schedule: {
+      isScheduled: {
+        type: Boolean,
+        default: false,
+      },
+      date: {
+        type: Date,
+      },
     },
     participants: [
       {
