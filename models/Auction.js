@@ -39,6 +39,9 @@ const auctionSchema = new mongoose.Schema(
       date: {
         type: Date,
       },
+      endDate: {
+        type: Date,
+      },
     },
     participants: [
       {

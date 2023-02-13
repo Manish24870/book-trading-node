@@ -39,3 +39,28 @@ export const getAuction = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = POST /api/auction/:bookId/save-settings
+// Function to save auction settings
+// Auth = true
+export const saveSettings = async (req, res, next) => {
+  try {
+    const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id });
+    console.log(req.body);
+    auction.schedule.isScheduled = req.body.schedule.isScheduled;
+    if (req.body.schedule.date) {
+      auction.schedule.date = req.body.schedule.date;
+    }
+    if (req.body.schedule.endDate) {
+      auction.schedule.endDate = req.body.schedule.endDate;
+    }
+    await auction.save();
+    res.status(200).json({
+      status: "success",
+      message: "Auction settings saved successfully",
+      auction,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
