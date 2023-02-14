@@ -46,7 +46,6 @@ export const getAuction = async (req, res, next) => {
 export const saveSettings = async (req, res, next) => {
   try {
     const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id });
-    console.log(req.body);
     auction.schedule.isScheduled = req.body.schedule.isScheduled;
     if (req.body.schedule.date) {
       auction.schedule.date = req.body.schedule.date;
@@ -58,6 +57,37 @@ export const saveSettings = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Auction settings saved successfully",
+      auction,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = POST /api/auction/:bookId/bid
+// Function to place a bid in the auction
+// Auth = true
+export const placeBid = async (req, res, next) => {
+  try {
+    const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id });
+
+    let alreadyParticipated = auction.participants.findIndex((el) =>
+      el.participant.equals(req.user._id)
+    );
+
+    // If the user has already participated in the auction
+    if (alreadyParticipated > -1) {
+      auction.participants[alreadyParticipated].bids.push(req.body.bid);
+      await auction.save();
+    } else {
+      auction.participants.push({
+        participant: req.user._id,
+        bids: [req.body.bid],
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Bid placed successfully",
       auction,
     });
   } catch (err) {
