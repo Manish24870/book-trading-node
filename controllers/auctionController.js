@@ -68,6 +68,7 @@ export const saveSettings = async (req, res, next) => {
 // Function to place a bid in the auction
 // Auth = true
 export const placeBid = async (req, res, next) => {
+  console.log(req.body);
   try {
     const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id });
 
@@ -77,18 +78,38 @@ export const placeBid = async (req, res, next) => {
 
     // If the user has already participated in the auction
     if (alreadyParticipated > -1) {
-      auction.participants[alreadyParticipated].bids.push(req.body.bid);
-      await auction.save();
+      auction.participants[alreadyParticipated].bids.push({
+        amount: req.body.amount,
+        date: new Date(),
+      });
     } else {
       auction.participants.push({
         participant: req.user._id,
-        bids: [req.body.bid],
+        bids: [
+          {
+            amount: req.body.amount,
+            date: new Date(),
+          },
+        ],
       });
     }
+    auction.activities.push({
+      user: req.user._id,
+      data: {
+        bidAmount: req.body.amount,
+        date: new Date(),
+      },
+    });
+    await auction.save();
+
+    const savedAuction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id })
+      .populate("participants.participant")
+      .populate("activities.user");
+
     res.status(200).json({
       status: "success",
       message: "Bid placed successfully",
-      auction,
+      auction: savedAuction,
     });
   } catch (err) {
     next(err);
