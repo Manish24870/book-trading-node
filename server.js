@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
+import { Server } from "socket.io";
 
 import authRouter from "./routes/authRoutes.js";
 import bookRouter from "./routes/bookRoutes.js";
@@ -13,7 +14,11 @@ import exchangeRouter from "./routes/exchangeRoutes.js";
 import auctionRouter from "./routes/auctionRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 
+import Auction from "./models/Auction.js";
+
 dotenv.config();
+
+const io = new Server(8900, { cors: { origin: "*" } });
 
 const app = express();
 app.use(cors());
@@ -32,6 +37,43 @@ mongoose
     console.log("Error connecting to databse");
     console.log(err);
   });
+
+let users = [];
+
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) && users.push();
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
+// Socket io connection
+io.on("connection", (socket) => {
+  console.log("User connected");
+
+  socket.on("addUser", (userId) => {
+    addUser(userId, socket.id);
+  });
+
+  // When a user places a bid
+  socket.on("placedBid", async (data) => {
+    const auction = await Auction.findOne({ book: data.bookId })
+      .populate("book")
+      .populate("owner")
+      .populate("participants.participant")
+      .populate("activities.user");
+
+    io.emit("placedBidResponse", auction);
+  });
+
+  // when user disconnects
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+    removeUser(socket.id);
+    // io.emit("getUsers", users);
+  });
+});
 
 // Mount routes
 app.use("/api/auth", authRouter);

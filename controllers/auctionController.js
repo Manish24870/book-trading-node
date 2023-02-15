@@ -27,9 +27,11 @@ export const getMyAuctionBooks = async (req, res, next) => {
 // Auth = true
 export const getAuction = async (req, res, next) => {
   try {
-    const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id })
+    const auction = await Auction.findOne({ book: req.params.bookId })
       .populate("book")
-      .populate("owner");
+      .populate("owner")
+      .populate("participants.participant")
+      .populate("activities.user");
     res.status(200).json({
       status: "success",
       message: "Auction fetched successfully",
@@ -70,7 +72,7 @@ export const saveSettings = async (req, res, next) => {
 export const placeBid = async (req, res, next) => {
   console.log(req.body);
   try {
-    const auction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id });
+    const auction = await Auction.findOne({ book: req.params.bookId });
 
     let alreadyParticipated = auction.participants.findIndex((el) =>
       el.participant.equals(req.user._id)
@@ -93,6 +95,8 @@ export const placeBid = async (req, res, next) => {
         ],
       });
     }
+
+    // Create an activity in auction
     auction.activities.push({
       user: req.user._id,
       data: {
@@ -103,6 +107,8 @@ export const placeBid = async (req, res, next) => {
     await auction.save();
 
     const savedAuction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id })
+      .populate("book")
+      .populate("owner")
       .populate("participants.participant")
       .populate("activities.user");
 
