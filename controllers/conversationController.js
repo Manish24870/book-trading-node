@@ -1,6 +1,9 @@
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 
+// Route = POST /api/conversation
+// Function to create a new conversation
+// Auth = true
 export const createConversation = async (req, res, next) => {
   try {
     const conversation = await Conversation.findOne({
@@ -24,6 +27,25 @@ export const createConversation = async (req, res, next) => {
         conversation,
       });
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = GET /api/conversation
+// Function to get user conversations
+// Auth = true
+export const getConversations = async (req, res, next) => {
+  try {
+    const conversation = await Conversation.find({
+      members: { $in: [req.user.user_id] },
+    })
+      .populate("members")
+      .sort("-createdAt");
+    res.status(200).json({
+      status: "success",
+      conversation,
+    });
   } catch (err) {
     next(err);
   }
