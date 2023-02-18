@@ -37,14 +37,14 @@ export const createConversation = async (req, res, next) => {
 // Auth = true
 export const getConversations = async (req, res, next) => {
   try {
-    const conversation = await Conversation.find({
+    const conversations = await Conversation.find({
       members: { $in: [req.user._id] },
     })
       .populate("members")
       .sort("-createdAt");
     res.status(200).json({
       status: "success",
-      conversation,
+      conversations,
     });
   } catch (err) {
     next(err);

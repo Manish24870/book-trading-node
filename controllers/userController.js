@@ -104,3 +104,19 @@ export const editProfile = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = /api/user/users
+// Function to get all users
+// Auth = true
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched users successfully",
+      users,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
