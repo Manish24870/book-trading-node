@@ -14,6 +14,7 @@ import userRouter from "./routes/userRoutes.js";
 import exchangeRouter from "./routes/exchangeRoutes.js";
 import auctionRouter from "./routes/auctionRoutes.js";
 import conversationRouter from "./routes/conversationRoutes.js";
+import messageRouter from "./routes/messageRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
 
 import Auction from "./models/Auction.js";
@@ -143,6 +144,7 @@ app.use("/api/user", userRouter);
 app.use("/api/exchange", exchangeRouter);
 app.use("/api/auction", auctionRouter);
 app.use("/api/conversation", conversationRouter);
+app.use("/api/message", messageRouter);
 
 // Global error handler
 app.use(globalErrorHandler);

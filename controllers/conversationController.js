@@ -38,7 +38,7 @@ export const createConversation = async (req, res, next) => {
 export const getConversations = async (req, res, next) => {
   try {
     const conversation = await Conversation.find({
-      members: { $in: [req.user.user_id] },
+      members: { $in: [req.user._id] },
     })
       .populate("members")
       .sort("-createdAt");
