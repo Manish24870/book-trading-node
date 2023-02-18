@@ -4,6 +4,7 @@ import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
+import { CronJob } from "cron";
 
 import authRouter from "./routes/authRoutes.js";
 import bookRouter from "./routes/bookRoutes.js";
@@ -64,7 +65,64 @@ io.on("connection", (socket) => {
       .populate("participants.participant")
       .populate("activities.user");
 
-    io.emit("placedBidResponse", auction);
+    io.emit("placedBidResponse", { auction, bidderId: data.currentUserId });
+  });
+
+  // When a user creates auction settings, create a new cron job for the future
+  socket.on("createAuctionSchedule", async (data) => {
+    const auction1 = await Auction.findById(data._id);
+
+    new CronJob(
+      new Date(auction1.schedule.date),
+      async () => {
+        const auction2 = await Auction.findById(data._id)
+          .populate("book")
+          .populate("owner")
+          .populate("participants.participant")
+          .populate("activities.user");
+        auction2.started = true;
+        await auction2.save();
+        io.emit("auctionStarted", auction2);
+      },
+      null,
+      true
+    );
+    new CronJob(
+      new Date(auction1.schedule.endDate),
+      async () => {
+        const auction2 = await Auction.findById(data._id)
+          .populate("book")
+          .populate("owner")
+          .populate("participants.participant")
+          .populate("activities.user");
+
+        let winner = {};
+        let highestBid = 0;
+
+        // Find the winner
+        auction2.participants.forEach((participant) => {
+          let totalMoney = 0;
+          participant?.bids?.forEach((bid) => {
+            totalMoney += bid.amount;
+          });
+          if (totalMoney > highestBid) {
+            highestBid = totalMoney;
+            winner = {
+              participant: participant.participant,
+              bid: totalMoney,
+              bids: participant.bids,
+              _id: participant._id,
+            };
+          }
+        });
+        auction2.completed = true;
+        auction2.winner = winner;
+        await auction2.save();
+        io.emit("auctionEnded", auction2);
+      },
+      null,
+      true
+    );
   });
 
   // when user disconnects

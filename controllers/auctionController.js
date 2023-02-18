@@ -106,7 +106,7 @@ export const placeBid = async (req, res, next) => {
     });
     await auction.save();
 
-    const savedAuction = await Auction.findOne({ book: req.params.bookId, owner: req.user._id })
+    const savedAuction = await Auction.findOne({ book: req.params.bookId })
       .populate("book")
       .populate("owner")
       .populate("participants.participant")
