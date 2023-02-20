@@ -64,6 +64,42 @@ export const loadWallet = async (req, res, next) => {
   }
 };
 
+// Route = POST /api/wallet/cashout
+// Cashout the money from wallet
+// Auth = true
+export const cashoutWallet = async (req, res, next) => {
+  try {
+    const wallet = await Wallet.findById(req.user.wallet);
+    if (wallet.amount >= req.body.amount) {
+      const cashoutAmount = req.body.amount / 120;
+
+      const charge = await Stripe(process.env.STRIPE_KEY).charges.create({
+        amount: Math.floor(cashoutAmount * 100),
+        currency: "usd",
+        description: "Cashout by user " + req.user.name,
+        source: req.user.stripeId,
+      });
+      console.log(charge);
+
+      wallet.stripeTransactions.push(charge);
+      wallet.amount -= cashoutAmount * 120;
+      await wallet.save();
+      return res.status(200).json({
+        status: "success",
+        message: "Cashout successful",
+        wallet,
+      });
+    } else {
+      return res.status(400).json({
+        status: "error",
+        error: "Amount is more than your wallet value",
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Route = POST /api/wallet/buy
 // Buy a book
 // Auth = true

@@ -1,6 +1,7 @@
 import Book from "../models/Book.js";
 import Auction from "../models/Auction.js";
 import ApiError from "../utils/apiError.js";
+import Wallet from "../models/Wallet.js";
 
 // Route = GET /api/auction/my-auction-books
 // Function to get my auction books
@@ -70,7 +71,6 @@ export const saveSettings = async (req, res, next) => {
 // Function to place a bid in the auction
 // Auth = true
 export const placeBid = async (req, res, next) => {
-  console.log(req.body);
   try {
     const auction = await Auction.findOne({ book: req.params.bookId });
 
@@ -105,6 +105,16 @@ export const placeBid = async (req, res, next) => {
       },
     });
     await auction.save();
+
+    const wallet = await Wallet.findOne({ owner: req.user._id });
+    wallet.appTransactions.push({
+      transactionType: "auction-bid",
+      transactionAmount: req.body.amount,
+    });
+    console.log(wallet.amount, req.body.amount);
+    wallet.amount -= req.body.amount;
+
+    await wallet.save();
 
     const savedAuction = await Auction.findOne({ book: req.params.bookId })
       .populate("book")

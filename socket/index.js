@@ -11,6 +11,7 @@ const addUser = (userId, socketId) => {
 };
 
 const removeUser = (socketId) => {
+  console.log("REMOVED");
   users = users.filter((user) => user.socketId !== socketId);
 };
 
@@ -19,10 +20,39 @@ const getUser = (userId) => {
 };
 
 io.on("connection", (socket) => {
+  // For video call
+  socket.emit("me", socket.id);
+
+  socket.on("conversationSelected", (id) => {
+    console.log(users);
+    let user = users.filter((el) => el.userId === id);
+    if (user) {
+      console.log(user);
+      io.emit("toCallUser", user[0]);
+    }
+  });
+
+  socket.on("callUser", (data) => {
+    io.to(data.userToCall).emit("callUser", {
+      signal: data.signalData,
+      from: data.from,
+      name: data.name,
+    });
+  });
+
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
+  });
+
+  socket.on("endCall", (data) => {
+    io.emit("callEnded");
+  });
+
   // take user id and socket id from user
   // when user connects
   console.log("Chat User connected");
   socket.on("addUser", (userId) => {
+    console.log(userId);
     addUser(userId, socket.id);
     io.emit("getUsers", users);
   });
@@ -38,7 +68,8 @@ io.on("connection", (socket) => {
 
   // when user disconnects
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    console.log("Chat User disconnected");
+    socket.broadcast.emit("callEnded");
     removeUser(socket.id);
     io.emit("getUsers", users);
   });
