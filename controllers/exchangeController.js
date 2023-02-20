@@ -31,7 +31,15 @@ export const getMyInitiates = async (req, res, next) => {
     })
       .populate("owner")
       .populate("initiator.initiatorBooks")
-      .populate("bookWanted");
+      .populate("initiator.initiatorUser")
+      .populate({
+        path: "bookWanted",
+        model: "Book",
+        populate: {
+          path: "owner",
+          model: "User",
+        },
+      });
     res.status(200).json({
       status: "success",
       message: "My initiates fetched successfully",

@@ -120,3 +120,20 @@ export const getUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = /api/user/change-role/:userId
+// Function to change a user role
+// Auth = true
+export const changeRole = async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.userId);
+    user.role = req.body.newRole;
+    await user.save();
+    res.status(200).json({
+      status: "success",
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
