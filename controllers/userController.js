@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 
 import User from "../models/User.js";
 import Exchange from "../models/Exchange.js";
+import Order from "../models/Order.js";
 import ApiError from "../utils/apiError.js";
 import isEmpty from "../utils/isEmpty.js";
 import inputValidator from "../validation/inputValidator.js";
@@ -144,16 +145,21 @@ export const changeRole = async (req, res, next) => {
 // Auth = true
 export const writeReview = async (req, res, next) => {
   try {
+    const reviewedFor = await User.findById(req.body.reviewedFor);
     if (req.body.type === "exchange") {
       let exchange = await Exchange.findById(req.body.transaction);
-      if (exchange) {
+      let reviewIndex = reviewedFor.reviews.findIndex(
+        (review) =>
+          req.user._id.equals(review.reviewedBy._id) && exchange._id.equals(req.body.transaction)
+      );
+      if (reviewIndex >= 0) {
         return res.status(400).json({
           status: "error",
           error: "Already reviewed",
         });
       }
     }
-    const reviewedFor = await User.findById(req.body.reviewedFor);
+
     const newReview = {
       reviewedBy: {
         username: req.user.username,
@@ -173,6 +179,22 @@ export const writeReview = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       reviewedFor,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = /api/user/my-orders
+// Function to get current user orders
+// Auth = true
+export const getMyOrders = async (req, res, next) => {
+  console.log(req.user._id);
+  try {
+    const orders = await Order.find({ buyer: req.user._id }).populate("buyer");
+    res.status(200).json({
+      status: "success",
+      orders,
     });
   } catch (err) {
     next(err);

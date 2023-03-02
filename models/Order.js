@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema(
     },
     orderItems: [],
     shippingDetails: {},
+    sellers: [],
   },
   { timestamps: true }
 );

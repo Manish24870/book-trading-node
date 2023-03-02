@@ -7,6 +7,7 @@ import {
   getUsers,
   changeRole,
   writeReview,
+  getMyOrders,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -17,5 +18,6 @@ router.post("/edit", upload.single("photo"), protect, editProfile);
 router.get("/users", protect, getUsers);
 router.post("/change-role/:userId", protect, changeRole);
 router.post("/review/add", protect, writeReview);
+router.get("/my-orders", protect, getMyOrders);
 
 export default router;

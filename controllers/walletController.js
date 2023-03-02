@@ -174,6 +174,7 @@ export const buyBook = async (req, res, next) => {
       totalPrice,
       orderItems: req.body.cartItems,
       shippingDetails: req.body.shippingDetails,
+      sellers,
     });
 
     await order.save();
