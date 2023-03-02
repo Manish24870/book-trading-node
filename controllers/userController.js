@@ -32,8 +32,6 @@ export const editProfile = async (req, res, next) => {
   delete validationData["confirmPassword"];
   const { errors, isValid } = inputValidator(validationData);
 
-  console.log("BODY", req.body);
-
   if (!isValid) {
     return res.status(400).json({
       status: "fail",
@@ -144,6 +142,7 @@ export const changeRole = async (req, res, next) => {
 // Function to create a new review
 // Auth = true
 export const writeReview = async (req, res, next) => {
+  console.log(req.body);
   try {
     const reviewedFor = await User.findById(req.body.reviewedFor);
     if (req.body.type === "exchange") {
@@ -153,6 +152,28 @@ export const writeReview = async (req, res, next) => {
           req.user._id.equals(review.reviewedBy._id) && exchange._id.equals(req.body.transaction)
       );
       if (reviewIndex >= 0) {
+        return res.status(400).json({
+          status: "error",
+          error: "Already reviewed",
+        });
+      }
+    }
+
+    if (req.body.type === "buy") {
+      let order = await Order.findById(req.body.order);
+
+      let orderItemIndex = order.orderItems.findIndex((el) => el._id == req.body.transaction);
+      console.log("III", orderItemIndex);
+      console.log("REV FOR", reviewedFor.reviews);
+      console.log();
+      if (
+        orderItemIndex > -1 &&
+        reviewedFor.reviews.findIndex(
+          (review) =>
+            req.user._id.equals(review.reviewedBy._id) &&
+            review.transaction === req.body.transaction
+        ) > -1
+      ) {
         return res.status(400).json({
           status: "error",
           error: "Already reviewed",
@@ -189,7 +210,6 @@ export const writeReview = async (req, res, next) => {
 // Function to get current user orders
 // Auth = true
 export const getMyOrders = async (req, res, next) => {
-  console.log(req.user._id);
   try {
     const orders = await Order.find({ buyer: req.user._id }).populate("buyer");
     res.status(200).json({
