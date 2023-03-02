@@ -163,9 +163,7 @@ export const writeReview = async (req, res, next) => {
       let order = await Order.findById(req.body.order);
 
       let orderItemIndex = order.orderItems.findIndex((el) => el._id == req.body.transaction);
-      console.log("III", orderItemIndex);
-      console.log("REV FOR", reviewedFor.reviews);
-      console.log();
+
       if (
         orderItemIndex > -1 &&
         reviewedFor.reviews.findIndex(
@@ -174,6 +172,20 @@ export const writeReview = async (req, res, next) => {
             review.transaction === req.body.transaction
         ) > -1
       ) {
+        return res.status(400).json({
+          status: "error",
+          error: "Already reviewed",
+        });
+      }
+    }
+
+    if (req.body.type === "auction") {
+      let alreadyReviewed = reviewedFor.reviews.findIndex(
+        (review) =>
+          req.user._id.equals(review.reviewedBy._id) && review.transaction === req.body.transaction
+      );
+
+      if (alreadyReviewed > -1) {
         return res.status(400).json({
           status: "error",
           error: "Already reviewed",
