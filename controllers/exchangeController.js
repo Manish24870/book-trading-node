@@ -127,7 +127,6 @@ export const getMyOffers = async (req, res, next) => {
 // Function to accept an exchange offer
 // Auth = true
 export const acceptOffer = async (req, res, next) => {
-  console.log(req.body);
   try {
     const exchange = await Exchange.findById(req.body.exchangeId);
     const initiatorIndex = exchange.initiator.findIndex((el) =>

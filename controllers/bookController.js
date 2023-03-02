@@ -69,14 +69,14 @@ export const getAllBooks = async (req, res, next) => {
   let books, count;
   try {
     if (type === "All") {
-      books = await Book.find()
+      books = await Book.find({ available: true })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .sort("-createdAt")
         .populate("owner");
       count = await Book.countDocuments();
     } else {
-      books = await Book.find({ listing: type })
+      books = await Book.find({ listing: type, available: true })
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .sort("-createdAt")

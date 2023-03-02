@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import Wallet from "../models/Wallet.js";
 import Order from "../models/Order.js";
+import Book from "../models/Book.js";
 
 // Route = GET /api/wallet
 // Fetch a user wallet
@@ -111,6 +112,7 @@ export const buyBook = async (req, res, next) => {
     let totalPrice = 0;
     let sellersId = [];
     let sellers = [];
+
     req.body.cartItems.forEach((el) => {
       totalPrice += el.price * el.quantity;
       if (!sellersId.includes(el.owner._id)) {
@@ -158,6 +160,13 @@ export const buyBook = async (req, res, next) => {
       items: req.body.cartItems,
     });
     await buyerWallet.save();
+
+    // Make books unavailable
+    req.body.cartItems.forEach(async (el) => {
+      const availableBook = await Book.findById(el._id);
+      availableBook.available = false;
+      await availableBook.save();
+    });
 
     // Create an order
     const order = new Order({
