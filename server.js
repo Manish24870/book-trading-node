@@ -124,8 +124,10 @@ io.on("connection", (socket) => {
         auction2.winner = winner;
         await auction2.save();
         io.emit("auctionEnded", auction2);
-        const winnerUser = await User.findById(winner.participant);
-        sendAuctionWinnerEmail(winnerUser.email, auction2.book._id);
+        if (winner.participant) {
+          const winnerUser = await User.findById(winner.participant);
+          sendAuctionWinnerEmail(winnerUser.email, auction2.book._id);
+        }
       },
       null,
       true

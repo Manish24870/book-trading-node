@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import Exchange from "../models/Exchange.js";
 import Order from "../models/Order.js";
+import Book from "../models/Book.js";
 import ApiError from "../utils/apiError.js";
 import isEmpty from "../utils/isEmpty.js";
 import inputValidator from "../validation/inputValidator.js";
@@ -203,6 +204,7 @@ export const writeReview = async (req, res, next) => {
       transaction: req.body.transaction,
       reviewNumber: req.body.reviewNumber,
       reviewText: req.body.reviewText,
+      reviewedAt: new Date(),
     };
     reviewedFor.reviews.push(newReview);
 
@@ -229,5 +231,17 @@ export const getMyOrders = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const getMyBooks = async (req, res, next) => {
+  try {
+    const books = await Book.find({ owner: req.user._id }).populate("owner");
+    res.status(200).json({
+      status: "success",
+      books,
+    });
+  } catch (err) {
+    next;
   }
 };

@@ -8,6 +8,7 @@ import {
   changeRole,
   writeReview,
   getMyOrders,
+  getMyBooks,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -19,5 +20,6 @@ router.get("/users", protect, getUsers);
 router.post("/change-role/:userId", protect, changeRole);
 router.post("/review/add", protect, writeReview);
 router.get("/my-orders", protect, getMyOrders);
+router.get("/my-books", protect, getMyBooks);
 
 export default router;
