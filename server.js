@@ -17,9 +17,10 @@ import auctionRouter from "./routes/auctionRoutes.js";
 import conversationRouter from "./routes/conversationRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
-import { sendAuctionStartedEmail } from "./utils/sendgrid.js";
+import { sendAuctionStartedEmail, sendAuctionWinnerEmail } from "./utils/sendgrid.js";
 
 import Auction from "./models/Auction.js";
+import User from "./models/User.js";
 
 const io = new Server(8900, { cors: { origin: "*" } });
 
@@ -84,9 +85,8 @@ io.on("connection", (socket) => {
           .populate("activities.user");
         auction2.started = true;
         await auction2.save();
-        console.log("BOOK", data.book);
-        sendAuctionStartedEmail(auction2.emailSubscribers, data.book._id);
         io.emit("auctionStarted", auction2);
+        sendAuctionStartedEmail(auction2.emailSubscribers, data.book._id);
       },
       null,
       true
@@ -119,10 +119,13 @@ io.on("connection", (socket) => {
             };
           }
         });
+
         auction2.completed = true;
         auction2.winner = winner;
         await auction2.save();
         io.emit("auctionEnded", auction2);
+        const winnerUser = await User.findById(winner.participant);
+        sendAuctionWinnerEmail(winnerUser.email, auction2.book._id);
       },
       null,
       true

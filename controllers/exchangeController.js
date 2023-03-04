@@ -140,6 +140,7 @@ export const acceptOffer = async (req, res, next) => {
     exchange.isExchanged = true;
     exchange.initiator[initiatorIndex].offerStatus = "accepted";
     exchange.initiator[initiatorIndex].acceptedAt = Date.now();
+    exchange.initiator[initiatorIndex].feedback = req.body.feedbackText;
     exchange.initiator.forEach((el, index) => {
       if (index !== initiatorIndex) {
         el.offerStatus = "rejected";
@@ -167,6 +168,7 @@ export const rejectOffer = async (req, res, next) => {
       el._id.equals(req.body.initiatorItemId)
     );
     exchange.initiator[initiatorIndex].offerStatus = "rejected";
+    exchange.initiator[initiatorIndex].feedback = req.body.feedbackText;
     await exchange.save();
     res.status(200).json({
       status: "success",

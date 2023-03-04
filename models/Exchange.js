@@ -28,6 +28,9 @@ const exchangeSchema = new mongoose.Schema(
         acceptedAt: {
           type: Date,
         },
+        feedback: {
+          type: String,
+        },
       },
     ],
     owner: {
