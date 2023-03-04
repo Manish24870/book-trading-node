@@ -5,6 +5,7 @@ import chalk from "chalk";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
 import { CronJob } from "cron";
+dotenv.config();
 
 import authRouter from "./routes/authRoutes.js";
 import bookRouter from "./routes/bookRoutes.js";
@@ -16,10 +17,9 @@ import auctionRouter from "./routes/auctionRoutes.js";
 import conversationRouter from "./routes/conversationRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import globalErrorHandler from "./controllers/errorController.js";
+import { sendAuctionStartedEmail } from "./utils/sendgrid.js";
 
 import Auction from "./models/Auction.js";
-
-dotenv.config();
 
 const io = new Server(8900, { cors: { origin: "*" } });
 
@@ -84,6 +84,8 @@ io.on("connection", (socket) => {
           .populate("activities.user");
         auction2.started = true;
         await auction2.save();
+        console.log("BOOK", data.book);
+        sendAuctionStartedEmail(auction2.emailSubscribers, data.book._id);
         io.emit("auctionStarted", auction2);
       },
       null,

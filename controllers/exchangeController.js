@@ -132,7 +132,6 @@ export const acceptOffer = async (req, res, next) => {
     const initiatorIndex = exchange.initiator.findIndex((el) =>
       el._id.equals(req.body.initiatorItemId)
     );
-    console.log(initiatorIndex);
     // If the book has already been exchanged
     if (exchange.isExchanged) {
       return next(new ApiError("This book has already been exchanged", 400));

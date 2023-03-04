@@ -58,6 +58,7 @@ const auctionSchema = new mongoose.Schema(
         data: {},
       },
     ],
+    emailSubscribers: [],
   },
   { timestamps: true }
 );

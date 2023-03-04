@@ -131,3 +131,21 @@ export const placeBid = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = POST /api/auction/:auctionId/subscribe
+// Function to subscribe to email started email for an auction
+// Auth = true
+export const subscribeToAuction = async (req, res, next) => {
+  try {
+    const auction = await Auction.findById(req.params.auctionId);
+    auction.emailSubscribers.push({ _id: req.user._id, email: req.user.email });
+    await auction.save();
+    res.status(200).json({
+      status: "success",
+      message: "Subscribed to auction successfully",
+      auction,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
