@@ -96,6 +96,23 @@ export const getAllBooks = async (req, res, next) => {
   }
 };
 
+// Route = GET /api/books/all
+// Function to fetch all available and unavailable
+// Auth = true
+export const getAllBooksAdmin = async (req, res, next) => {
+  try {
+    const books = await Book.find().sort("-createdAt").populate("owner");
+
+    res.status(200).json({
+      status: "Success",
+      message: "Books fetched successfully",
+      books,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Route = GET /api/books
 // Function to fetch all books
 // Auth = true
@@ -183,6 +200,23 @@ export const createAnswer = async (req, res, next) => {
     res.status(200).json({
       status: "Success",
       message: "Question created successfully",
+      book,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route= /api/books/change-availability/:bookId
+// Function to change a book availability
+export const changeAvailability = async (req, res, next) => {
+  try {
+    let book = await Book.findById(req.params.bookId).populate("owner");
+    console.log(req.body);
+    book.available = req.body.newAvailability;
+    await book.save();
+    res.status(200).json({
+      status: "success",
       book,
     });
   } catch (err) {

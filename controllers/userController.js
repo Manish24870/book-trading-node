@@ -142,7 +142,6 @@ export const changeRole = async (req, res, next) => {
 // Function to create a new review
 // Auth = true
 export const writeReview = async (req, res, next) => {
-  console.log(req.body);
   try {
     const reviewedFor = await User.findById(req.body.reviewedFor);
     if (req.body.type === "exchange") {
