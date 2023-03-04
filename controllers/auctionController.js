@@ -108,7 +108,7 @@ export const placeBid = async (req, res, next) => {
 
     const wallet = await Wallet.findOne({ owner: req.user._id });
     wallet.appTransactions.push({
-      transactionType: "auction-bid",
+      transactionType: "Auction bid",
       transactionAmount: req.body.amount,
     });
     console.log(wallet.amount, req.body.amount);

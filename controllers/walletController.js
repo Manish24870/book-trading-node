@@ -50,7 +50,7 @@ export const loadWallet = async (req, res, next) => {
         },
       },
     });
-    wallet.stripeTransactions.push(session);
+    wallet.stripeTransactions.push({ ...session, transactionDate: new Date() });
     wallet.amount += loadAmount * 130;
     await wallet.save();
 
@@ -82,7 +82,7 @@ export const cashoutWallet = async (req, res, next) => {
       });
       console.log(charge);
 
-      wallet.stripeTransactions.push(charge);
+      wallet.stripeTransactions.push({ ...charge, transactionDate: new Date() });
       wallet.amount -= cashoutAmount * 120;
       await wallet.save();
       return res.status(200).json({
@@ -141,7 +141,7 @@ export const buyBook = async (req, res, next) => {
         });
         sellerWallet.amount += sellerTotal;
         sellerWallet.appTransactions.push({
-          transactionType: "Book Payment",
+          transactionType: "Book sell",
           transactionAmount: totalPrice,
           buyer: req.user._id,
           seller: sellers,
@@ -153,7 +153,7 @@ export const buyBook = async (req, res, next) => {
 
     buyerWallet.amount -= totalPrice;
     buyerWallet.appTransactions.push({
-      transactionType: "Book Payment",
+      transactionType: "Book payment",
       transactionAmount: totalPrice,
       buyer: req.user._id,
       seller: sellers,
