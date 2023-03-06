@@ -19,6 +19,12 @@ const bookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    publisher: {
+      type: String,
+    },
+    maturity: {
+      type: String,
+    },
 
     category: [
       {

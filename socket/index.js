@@ -24,10 +24,8 @@ io.on("connection", (socket) => {
   socket.emit("me", socket.id);
 
   socket.on("conversationSelected", (id) => {
-    console.log(users);
     let user = users.filter((el) => el.userId === id);
     if (user) {
-      console.log(user);
       io.emit("toCallUser", user[0]);
     }
   });

@@ -1,8 +1,7 @@
 import Book from "../models/Book.js";
 import Auction from "../models/Auction.js";
 import inputValidator from "../validation/inputValidator.js";
-import ApiError from "../utils/apiError.js";
-import Stripe from "stripe";
+import { booksCosineSimilarity } from "../utils/cosineSimilarity.js";
 
 // Route = POST /api/books/add
 // Function to add a new book listing
@@ -37,6 +36,8 @@ export const addBook = async (req, res, next) => {
     bookQuality: req.body.bookQuality,
     owner: req.user._id,
     images: bookImages,
+    maturity: req.body.maturity ? req.body.maturity : "",
+    publisher: req.body.publisher ? req.body.publisher : "",
   });
 
   try {
@@ -119,6 +120,11 @@ export const getAllBooksAdmin = async (req, res, next) => {
 export const getBook = async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.bookId).populate("owner");
+    const Books = await Book.find().populate("owner");
+    Books.forEach((book2) => {
+      const similarity = booksCosineSimilarity(book, book2);
+      console.log(similarity);
+    });
     res.status(200).json({
       status: "Success",
       message: "Book fetched successfully",
