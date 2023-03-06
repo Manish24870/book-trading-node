@@ -122,6 +122,7 @@ io.on("connection", (socket) => {
 
         auction2.completed = true;
         auction2.winner = winner;
+        auction2.completedAt = new Date();
         await auction2.save();
         io.emit("auctionEnded", auction2);
         if (winner.participant) {

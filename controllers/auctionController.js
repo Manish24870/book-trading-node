@@ -149,3 +149,21 @@ export const subscribeToAuction = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route = POST /api/auction/my-wins
+// Function to get my auction wins
+// Auth = true
+export const getMyWins = async (req, res, next) => {
+  try {
+    const auctions = await Auction.find({ "winner.participant": req.user._id }).populate(
+      "book owner"
+    );
+    res.status(200).json({
+      status: "success",
+      message: "Fetched my auction wins successfully",
+      auctions,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

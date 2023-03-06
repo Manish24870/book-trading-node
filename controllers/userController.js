@@ -234,6 +234,9 @@ export const getMyOrders = async (req, res, next) => {
   }
 };
 
+// Route = /api/user/my-books
+// Function to get all my books
+// Auth = true
 export const getMyBooks = async (req, res, next) => {
   try {
     const books = await Book.find({ owner: req.user._id }).populate("owner");
