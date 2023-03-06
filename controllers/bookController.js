@@ -121,14 +121,29 @@ export const getBook = async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.bookId).populate("owner");
     const Books = await Book.find().populate("owner");
+
+    // Sort the books according to the cosine similarity
+    let recommendedBooks = [];
     Books.forEach((book2) => {
-      const similarity = booksCosineSimilarity(book, book2);
-      console.log(similarity);
+      if (!book2._id.equals(req.params.bookId)) {
+        const similarity = booksCosineSimilarity(book, book2);
+        const clonedBook = JSON.parse(JSON.stringify(book2));
+        clonedBook.cosineSimilarity = similarity;
+        recommendedBooks.push(clonedBook);
+      }
     });
+    recommendedBooks.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity);
+    const topFiveRecommended = recommendedBooks.splice(0, 5);
+
+    const bookWithRecommended = JSON.parse(JSON.stringify(book));
+    bookWithRecommended.recommendedBooks = topFiveRecommended;
+
+    topFiveRecommended.forEach((book) => console.log(book.cosineSimilarity));
+
     res.status(200).json({
       status: "Success",
       message: "Book fetched successfully",
-      book,
+      book: bookWithRecommended,
     });
   } catch (err) {
     next(err);

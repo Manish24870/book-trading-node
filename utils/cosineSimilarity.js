@@ -3,9 +3,10 @@ export const wordCountMap = (book) => {
   const titleWords = book.title.split(" ");
   const authorWords = book.author.split(/[\s,]+/);
   let categoryWords = book.category;
-  const descriptionWords = book.description.split(/[\s,]+/);
+  // const descriptionWords = book.description.split(/[\s,]+/);
 
-  const allWords = [...titleWords, ...authorWords, ...categoryWords, ...descriptionWords];
+  // const allWords = [...titleWords, ...authorWords, ...categoryWords, ...descriptionWords];
+  const allWords = [...titleWords, ...authorWords, ...categoryWords];
   if (book.maturity) {
     allWords.push(book.maturity);
   }
@@ -20,12 +21,14 @@ export const wordCountMap = (book) => {
   return wordCount;
 };
 
+// Add the words to the dictionary
 export const addWordsToDictionary = (wordCount, dict) => {
   for (let key in wordCount) {
     dict[key] = true;
   }
 };
 
+// Create a vector from the word maps
 export const wordMapToVector = (map, dict) => {
   let wordCountVector = [];
   for (let term in dict) {
@@ -34,6 +37,7 @@ export const wordMapToVector = (map, dict) => {
   return wordCountVector;
 };
 
+// Find the dot product of vectors
 export const dotProduct = (vecA, vecB) => {
   let product = 0;
   for (let i = 0; i < vecA.length; i++) {
@@ -42,6 +46,7 @@ export const dotProduct = (vecA, vecB) => {
   return product;
 };
 
+// Find the magnitude of the vectors
 export const magnitude = (vec) => {
   let sum = 0;
   for (let i = 0; i < vec.length; i++) {
@@ -50,10 +55,12 @@ export const magnitude = (vec) => {
   return Math.sqrt(sum);
 };
 
+// Calculate the cosine similarity by using the formula
 export const cosineSimilarity = (vecA, vecB) => {
   return dotProduct(vecA, vecB) / (magnitude(vecA) * magnitude(vecB));
 };
 
+// Get two books as an input and find their cosine similarity
 export const booksCosineSimilarity = (bookA, bookB) => {
   const wordCountA = wordCountMap(bookA);
   const wordCountB = wordCountMap(bookB);
