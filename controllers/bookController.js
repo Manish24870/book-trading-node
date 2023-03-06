@@ -229,3 +229,29 @@ export const changeAvailability = async (req, res, next) => {
     next(err);
   }
 };
+
+// Route= /api/books/similar-listings/:isbn
+// Function to get similar listings by isbn
+export const getSimilarListings = async (req, res, next) => {
+  try {
+    const books = await Book.find({ isbn: req.params.isbn }).populate("owner");
+    const newBooks = [];
+    for (let book of books) {
+      if (book.listing === "Auction") {
+        let auction = await Auction.findOne({ book: book._id });
+        const clonedBook = JSON.parse(JSON.stringify(book));
+        clonedBook.winner = auction.winner;
+        newBooks.push(clonedBook);
+      } else {
+        newBooks.push(book);
+      }
+    }
+
+    res.status(200).json({
+      status: "success",
+      books: newBooks,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

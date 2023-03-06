@@ -147,6 +147,19 @@ export const acceptOffer = async (req, res, next) => {
       }
     });
 
+    // Make wanted book unavailable
+    const wantedBook = await Book.findById(exchange.bookWanted);
+    wantedBook.available = false;
+
+    // Make offer books unavailable
+    let initiatorBooks = exchange.initiator[initiatorIndex].initiatorBooks;
+
+    for (let iBookId of initiatorBooks) {
+      const initiatorBook = await Book.findById(iBookId);
+      initiatorBook.available = false;
+      await initiatorBook.save();
+    }
+    await wantedBook.save();
     await exchange.save();
     res.status(200).json({
       status: "success",

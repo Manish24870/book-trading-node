@@ -21,6 +21,7 @@ import { sendAuctionStartedEmail, sendAuctionWinnerEmail } from "./utils/sendgri
 
 import Auction from "./models/Auction.js";
 import User from "./models/User.js";
+import Book from "./models/Book.js";
 
 const io = new Server(8900, { cors: { origin: "*" } });
 
@@ -75,6 +76,7 @@ io.on("connection", (socket) => {
   socket.on("createAuctionSchedule", async (data) => {
     const auction1 = await Auction.findById(data._id);
 
+    // Auction start cron job
     new CronJob(
       new Date(auction1.schedule.date),
       async () => {
@@ -91,6 +93,7 @@ io.on("connection", (socket) => {
       null,
       true
     );
+    // Auction end cron job
     new CronJob(
       new Date(auction1.schedule.endDate),
       async () => {
@@ -119,6 +122,11 @@ io.on("connection", (socket) => {
             };
           }
         });
+
+        // Make the book unavailable
+        const auctionedBook = await Book.findById(auction2.book._id);
+        auctionedBook.available = false;
+        await auctionedBook.save();
 
         auction2.completed = true;
         auction2.winner = winner;

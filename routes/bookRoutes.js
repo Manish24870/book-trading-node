@@ -10,6 +10,7 @@ import {
   createAnswer,
   getAllBooksAdmin,
   changeAvailability,
+  getSimilarListings,
 } from "../controllers/bookController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -19,6 +20,7 @@ router.post("/add", protect, upload.array("images"), addBook);
 router.get("/", protect, getAllBooks);
 router.get("/all", protect, getAllBooksAdmin);
 
+router.get("/similar-listings/:isbn", protect, getSimilarListings);
 router.get("/:bookId", protect, getBook);
 router.delete("/bookId", protect, deleteBook);
 router.post("/:bookId/question", protect, createQuestion);
