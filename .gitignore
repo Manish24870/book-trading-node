@@ -2,9 +2,7 @@
 socket/node_modules
 .env
 
-/.VSCodeCounter
-./.VSCodeCounter
-.VSCodeCounter
+
 uploads
 /uploads
 ./uploads
