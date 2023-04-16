@@ -10,7 +10,7 @@ export const generateStripeAccountLink = async (req, res, next) => {
     const accountLink = await Stripe(process.env.STRIPE_KEY).accountLinks.create({
       account: req.user.stripeId,
       type: "account_onboarding",
-      refresh_url: "http://localhost:5000/api/stripe/authorize",
+      refresh_url: `http://localhost:5000/api/stripe/authorize?userId=${req.user._id}`,
       return_url: "http://localhost:3000/onboard",
     });
     return res.status(200).json({
@@ -56,11 +56,13 @@ export const stripeAccountOnboard = async (req, res, next) => {
 // After the created stripe link expires
 // Auth = true
 export const stripeAuthorize = async (req, res, next) => {
+  console.log("AA");
   try {
+    const user = await User.findById(req.query.userId);
     const accountLink = await Stripe(process.env.STRIPE_KEY).accountLinks.create({
-      account: req.user.stripeId,
+      account: user.stripeId,
       type: "account_onboarding",
-      refresh_url: "http://localhost:5000/api/books/stripe/authorize",
+      refresh_url: `http://localhost:5000/api/books/stripe/authorize?userId=${user._id}`,
       return_url: "http://localhost:3000/onboard",
     });
     return res.status(200).json({

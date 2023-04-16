@@ -9,6 +9,9 @@ import {
   writeReview,
   getMyOrders,
   getMyBooks,
+  resetPassword,
+  checkResetString,
+  createNewPassword,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -21,5 +24,8 @@ router.post("/change-role/:userId", protect, changeRole);
 router.post("/review/add", protect, writeReview);
 router.get("/my-orders", protect, getMyOrders);
 router.get("/my-books", protect, getMyBooks);
+router.post("/reset-password", resetPassword);
+router.post("/check-reset-string/:resetString", checkResetString);
+router.post("/reset-password/:resetString", createNewPassword);
 
 export default router;

@@ -120,7 +120,7 @@ export const getAllBooksAdmin = async (req, res, next) => {
 export const getBook = async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.bookId).populate("owner");
-    const Books = await Book.find().populate("owner");
+    const Books = await Book.find({ available: true }).populate("owner");
 
     // Sort the books according to the cosine similarity
     let recommendedBooks = [];
@@ -137,8 +137,6 @@ export const getBook = async (req, res, next) => {
 
     const bookWithRecommended = JSON.parse(JSON.stringify(book));
     bookWithRecommended.recommendedBooks = topFiveRecommended;
-
-    topFiveRecommended.forEach((book) => console.log(book.cosineSimilarity));
 
     res.status(200).json({
       status: "Success",
@@ -187,10 +185,28 @@ export const createQuestion = async (req, res, next) => {
     };
     book.discussion.push(newQuestion);
     await book.save();
+
+    const Books = await Book.find({ available: true }).populate("owner");
+    // Sort the books according to the cosine similarity
+    let recommendedBooks = [];
+    Books.forEach((book2) => {
+      if (!book2._id.equals(req.params.bookId)) {
+        const similarity = booksCosineSimilarity(book, book2);
+        const clonedBook = JSON.parse(JSON.stringify(book2));
+        clonedBook.cosineSimilarity = similarity;
+        recommendedBooks.push(clonedBook);
+      }
+    });
+    recommendedBooks.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity);
+    const topFiveRecommended = recommendedBooks.splice(0, 5);
+
+    const bookWithRecommended = JSON.parse(JSON.stringify(book));
+    bookWithRecommended.recommendedBooks = topFiveRecommended;
+
     res.status(200).json({
       status: "Success",
       message: "Question created successfully",
-      book,
+      book: bookWithRecommended,
     });
   } catch (err) {
     next(err);
@@ -218,10 +234,27 @@ export const createAnswer = async (req, res, next) => {
     book.discussion[questionIndex].answer = req.body.answer;
     await book.save();
 
+    const Books = await Book.find({ available: true }).populate("owner");
+    // Sort the books according to the cosine similarity
+    let recommendedBooks = [];
+    Books.forEach((book2) => {
+      if (!book2._id.equals(req.params.bookId)) {
+        const similarity = booksCosineSimilarity(book, book2);
+        const clonedBook = JSON.parse(JSON.stringify(book2));
+        clonedBook.cosineSimilarity = similarity;
+        recommendedBooks.push(clonedBook);
+      }
+    });
+    recommendedBooks.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity);
+    const topFiveRecommended = recommendedBooks.splice(0, 5);
+
+    const bookWithRecommended = JSON.parse(JSON.stringify(book));
+    bookWithRecommended.recommendedBooks = topFiveRecommended;
+
     res.status(200).json({
       status: "Success",
-      message: "Question created successfully",
-      book,
+      message: "Answer created successfully",
+      book: bookWithRecommended,
     });
   } catch (err) {
     next(err);

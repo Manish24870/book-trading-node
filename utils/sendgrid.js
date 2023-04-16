@@ -39,3 +39,37 @@ export const sendAuctionWinnerEmail = (user, auctionId) => {
       Promise.reject(err);
     });
 };
+
+// Function to send password reset email
+export const sendPasswordResetEmail = (user) => {
+  const message = {
+    to: user.email,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: "Password reset",
+    html: `<p>Click on the link here to reset your password.</p><br></br><p>Reset link= http://localhost:3000/new-password/${user.passwordResetString}.${user._id}</p>`,
+  };
+
+  sgMail
+    .send(message)
+    .then(() => console.log("Password reset email send successfully"))
+    .catch((err) => {
+      Promise.reject(err);
+    });
+};
+
+// Function to send password reset success email
+export const sendPasswordResetSuccessEmail = (user) => {
+  const message = {
+    to: user.email,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: "Password reset successful",
+    html: `<p>Your password was reset on ${new Date().toLocaleString()}.`,
+  };
+
+  sgMail
+    .send(message)
+    .then(() => console.log("Password reset successfully"))
+    .catch((err) => {
+      Promise.reject(err);
+    });
+};

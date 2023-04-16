@@ -6,7 +6,13 @@ export const wordCountMap = (book) => {
   // const descriptionWords = book.description.split(/[\s,]+/);
 
   // const allWords = [...titleWords, ...authorWords, ...categoryWords, ...descriptionWords];
-  const allWords = [...titleWords, ...authorWords, ...categoryWords];
+  const allWords = [
+    ...titleWords,
+    ...authorWords,
+    ...authorWords,
+    ...categoryWords,
+    ...categoryWords,
+  ];
   if (book.maturity) {
     allWords.push(book.maturity);
   }

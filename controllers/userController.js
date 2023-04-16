@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 import User from "../models/User.js";
 import Exchange from "../models/Exchange.js";
@@ -7,6 +8,7 @@ import Book from "../models/Book.js";
 import ApiError from "../utils/apiError.js";
 import isEmpty from "../utils/isEmpty.js";
 import inputValidator from "../validation/inputValidator.js";
+import { sendPasswordResetEmail, sendPasswordResetSuccessEmail } from "../utils/sendgrid.js";
 
 // Route = /api/user/get
 // Function to get my profile
@@ -246,5 +248,90 @@ export const getMyBooks = async (req, res, next) => {
     });
   } catch (err) {
     next;
+  }
+};
+
+// Route = /api/user/reset-password
+// Function to reset user password
+// Auth = true
+export const resetPassword = async (req, res, next) => {
+  try {
+    let foundUser = await User.findOne({
+      email: req.body.email,
+    });
+    const passwordResetString = crypto.randomBytes(64).toString("hex");
+    foundUser.passwordResetString = passwordResetString;
+    await foundUser.save();
+    sendPasswordResetEmail(foundUser);
+    res.status(200).json({
+      status: "success",
+      message: "Password reset link sent",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = /api/user/check-reset-string/:resetString
+// Function to check validity of reset string
+// Auth = true
+export const checkResetString = async (req, res, next) => {
+  try {
+    const resetString = req.params.resetString;
+    let brokenResetString = resetString.split(".");
+
+    const foundUser = await User.findOne({
+      passwordResetString: brokenResetString[0],
+      _id: brokenResetString[1],
+    });
+
+    if (!foundUser) {
+      res.status(400).json({
+        status: "error",
+        message: "Invalid password reset string",
+      });
+    } else {
+      res.status(200).json({
+        status: "success",
+        message: "Valid password reset link",
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route = /api/user/reset-password/:resetString
+// Function to create a new password
+// Auth = true
+export const createNewPassword = async (req, res, next) => {
+  try {
+    const resetString = req.params.resetString;
+    let brokenResetString = resetString.split(".");
+
+    const foundUser = await User.findOne({
+      passwordResetString: brokenResetString[0],
+      _id: brokenResetString[1],
+    });
+
+    if (!foundUser) {
+      res.status(400).json({
+        status: "error",
+        message: "Invalid password reset string",
+      });
+    } else {
+      console.log("BODY", req.body);
+      const encryptedPassword = await bcrypt.hash(req.body.password, 10);
+      foundUser.password = req.body.password;
+      foundUser.passwordResetString = "";
+      await foundUser.save();
+      sendPasswordResetSuccessEmail(foundUser);
+      res.status(200).json({
+        status: "success",
+        message: "Password reset successfully",
+      });
+    }
+  } catch (err) {
+    next(err);
   }
 };

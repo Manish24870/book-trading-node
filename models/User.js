@@ -50,6 +50,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
     },
+    passwordResetString: { type: String },
     reviews: [],
   },
   { timestamps: true }
